@@ -25,11 +25,12 @@ public partial class OnlineShopContext : DbContext
     {
         modelBuilder.Entity<Menu>(entity =>
         {
-            entity.HasNoKey();
+            entity.HasKey(e => e.Id); // 👈 This sets the primary key
 
             entity.Property(e => e.Id)
                 .ValueGeneratedOnAdd()
                 .HasColumnName("ID");
+
             entity.Property(e => e.Link).HasMaxLength(300);
             entity.Property(e => e.MenuTitle).HasMaxLength(50);
             entity.Property(e => e.Type).HasMaxLength(20);
