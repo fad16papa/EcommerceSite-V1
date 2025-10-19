@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -54,11 +55,27 @@ namespace OnlineShop.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,SubTitle,ImageName,Priority,Link,Position")] Banner banner)
+        public async Task<IActionResult> Create([Bind("Id,Title,SubTitle,ImageName,Priority,Link,Position")] Banner banner, IFormFile ImageFile)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(banner);
+                //=============Save Image File===================
+                {
+                    banner.ImageName = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(ImageFile.FileName);
+                    string fn;
+                    fn = Directory.GetCurrentDirectory();
+                    string ImagePath = Path.Combine(fn + "\\wwwroot\\images\\banners\\" + banner.ImageName);
+
+                    using (var stream = new FileStream(ImagePath, FileMode.Create))
+                    {
+                        {
+                            ImageFile.CopyTo(stream);
+                        }
+                    }
+                }
+                //==============================================
+                if (ImageFile != null)
+                    _context.Add(banner);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
